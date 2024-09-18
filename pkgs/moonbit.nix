@@ -7,7 +7,7 @@
 }:
 pkgs.stdenv.mkDerivation {
   pname = "moonbit";
-  version = "latest";
+  inherit version;
 
   src = builtins.fetchTarball {
     url = "https://cli.moonbitlang.com/binaries/${version}/moonbit-linux-x86_64.tar.gz";
