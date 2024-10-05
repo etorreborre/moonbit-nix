@@ -4,6 +4,9 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable";
     # flake-utils.url = "github:numtide/flake-utils";
+
+    ocaml-overlay.url = "github:nix-ocaml/nix-overlays";
+    ocaml-overlay.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -11,6 +14,7 @@
       self,
       nixpkgs,
       flake-utils,
+      ocaml-overlay,
     }:
     let
       system = "x86_64-linux";
@@ -20,8 +24,19 @@
       };
       pkgs = import nixpkgs {
         inherit system;
-        overlays = [ ocaml_overlay ];
+        overlays = [
+          ocaml_overlay
+          ocaml-overlay.overlays.default
+        ];
       };
+      opam-null = pkgs.writeShellScriptBin "opam" ''
+        if [ "$1" = "exec" ] && [ "$2" = "--" ]; then
+          $@
+        else 
+          echo "invalid opam command"
+          exit 1
+        fi
+      '';
     in
     {
       packages.${system} = rec {
@@ -36,17 +51,20 @@
         };
         rescript-compiler-dev = pkgs.mkShell {
           nativeBuildInputs = [ pkgs.ocamlPackages.ocaml ];
-          buildInputs = with pkgs.ocamlPackages; [
+          packages = with pkgs.ocamlPackages; [
+            opam-null
             dune_3
             ocamlformat_0_26_2
             cppo
             ounit2
             js_of_ocaml
+            reanalyze
 
             # node
             pkgs.ninja
             pkgs.nodejs
             pkgs.cargo
+            pkgs.python310
           ];
         };
       };
