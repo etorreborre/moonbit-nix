@@ -7,6 +7,8 @@
 
     ocaml-overlay.url = "github:nix-ocaml/nix-overlays";
     ocaml-overlay.inputs.nixpkgs.follows = "nixpkgs";
+    nix-vscode-extensions.url = "github:nix-community/nix-vscode-extensions";
+    nix-vscode-extensions.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
@@ -15,7 +17,8 @@
       nixpkgs,
       flake-utils,
       ocaml-overlay,
-    }:
+      ...
+    }@inputs:
     let
       system = "x86_64-linux";
       moonbit = pkgs.callPackage ./pkgs/moonbit.nix { };
@@ -24,6 +27,7 @@
       };
       pkgs = import nixpkgs {
         inherit system;
+        config.allowUnfree = true;
         overlays = [
           ocaml_overlay
           ocaml-overlay.overlays.default
@@ -49,24 +53,36 @@
         moonbit-dev = pkgs.mkShell {
           packages = [ moonbit ];
         };
-        rescript-compiler-dev = pkgs.mkShell {
-          nativeBuildInputs = [ pkgs.ocamlPackages.ocaml ];
-          packages = with pkgs.ocamlPackages; [
-            opam-null
-            dune_3
-            ocamlformat_0_26_2
-            cppo
-            ounit2
-            js_of_ocaml
-            reanalyze
+        rescript-compiler-dev =
+          let
+            ext = inputs.nix-vscode-extensions.extensions.${system};
+            vscode = pkgs.vscode-with-extensions.override {
+              vscodeExtensions = [
+                ext.vscode-marketplace.ms-vscode.makefile-tools
+                pkgs.vscode-extensions.ocamllabs.ocaml-platform
+              ];
+            };
+          in
+          pkgs.mkShell {
+            nativeBuildInputs = [ pkgs.ocamlPackages.ocaml ];
+            packages = with pkgs.ocamlPackages; [
+              opam-null
+              dune_3
+              ocamlformat_0_26_2
+              cppo
+              ounit2
+              js_of_ocaml
+              reanalyze
 
-            # node
-            pkgs.ninja
-            pkgs.nodejs
-            pkgs.cargo
-            pkgs.python310
-          ];
-        };
+              # node
+              pkgs.ninja
+              pkgs.nodejs
+              pkgs.cargo
+              pkgs.python310
+
+              vscode
+            ];
+          };
       };
     };
 }
