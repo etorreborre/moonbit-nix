@@ -51,7 +51,8 @@
       devShells.${system} = rec {
         default = moonbit-dev;
         moonbit-dev = pkgs.mkShell {
-          packages = [ moonbit ];
+          nativeBuildInputs = [ moonbit ];
+          packages = [ ];
         };
         rescript-compiler-dev =
           let
