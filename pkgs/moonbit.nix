@@ -11,7 +11,7 @@ pkgs.stdenv.mkDerivation {
 
   src = builtins.fetchTarball {
     url = "https://cli.moonbitlang.com/binaries/${version}/moonbit-linux-x86_64.tar.gz";
-    sha256 = "sha256:05aag1xji5hwidj7sdgk5clzjrqxr5352zx640mghk0flvw3g6w9";
+    sha256 = "sha256:0hjg147b5jnymrni8a8vzxzqfaf03bdvp4xjx1qrsi5g1l683fn0";
   };
 
   sourceRoot = ".";
