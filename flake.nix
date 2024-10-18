@@ -48,42 +48,54 @@
         default = moonbit;
       };
 
-      devShells.${system} = rec {
-        default = moonbit-dev;
-        moonbit-dev = pkgs.mkShell {
-          nativeBuildInputs = [ moonbit ];
-          packages = [ ];
-        };
-        rescript-compiler-dev =
-          let
-            ext = inputs.nix-vscode-extensions.extensions.${system};
-            vscode = pkgs.vscode-with-extensions.override {
-              vscodeExtensions = [
-                ext.vscode-marketplace.ms-vscode.makefile-tools
-                pkgs.vscode-extensions.ocamllabs.ocaml-platform
-              ];
-            };
-          in
-          pkgs.mkShell {
-            nativeBuildInputs = [ pkgs.ocamlPackages.ocaml ];
-            packages = with pkgs.ocamlPackages; [
-              opam-null
-              dune_3
-              ocamlformat_0_26_2
-              cppo
-              ounit2
-              js_of_ocaml
-              reanalyze
-
-              # node
-              pkgs.ninja
-              pkgs.nodejs
-              pkgs.cargo
-              pkgs.python310
-
-              vscode
+      devShells.${system} =
+        let
+          ext = inputs.nix-vscode-extensions.extensions.${system};
+          vscode = pkgs.vscode-with-extensions.override {
+            vscodeExtensions = [
+              ext.vscode-marketplace.moonbit.moonbit-lang
             ];
           };
-      };
+        in
+        rec {
+          default = moonbit-dev;
+
+          # moonbit dev shell/environment
+          moonbit-dev = pkgs.mkShell {
+            nativeBuildInputs = [ moonbit ];
+            packages = [ vscode ];
+          };
+
+          rescript-compiler-dev =
+            let
+              ext = inputs.nix-vscode-extensions.extensions.${system};
+              vscode = pkgs.vscode-with-extensions.override {
+                vscodeExtensions = [
+                  ext.vscode-marketplace.ms-vscode.makefile-tools
+                  pkgs.vscode-extensions.ocamllabs.ocaml-platform
+                ];
+              };
+            in
+            pkgs.mkShell {
+              nativeBuildInputs = [ pkgs.ocamlPackages.ocaml ];
+              packages = with pkgs.ocamlPackages; [
+                opam-null
+                dune_3
+                ocamlformat_0_26_2
+                cppo
+                ounit2
+                js_of_ocaml
+                reanalyze
+
+                # node
+                pkgs.ninja
+                pkgs.nodejs
+                pkgs.cargo
+                pkgs.python310
+
+                vscode
+              ];
+            };
+        };
     };
 }
