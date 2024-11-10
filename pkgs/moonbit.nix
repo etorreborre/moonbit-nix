@@ -38,7 +38,9 @@ let
   };
   moonbit-core = pkgs.callPackage ./moonbit-core.nix { moonbit = moonbit1; };
 in
-moonbit1.overrideAttrs (oldAttrs: rec {
+  {
+inherit  moonbit-core;
+moonbit = moonbit1.overrideAttrs (oldAttrs: rec {
   postInstall = ''
     wrapProgram $out/bin/moon --set MOON_HOME ${moonbit-core}/
   '';
@@ -49,4 +51,5 @@ moonbit1.overrideAttrs (oldAttrs: rec {
     platforms = platforms.darwin ++ platforms.linux;
     mainProgram = "moon";
   };
-})
+});
+}

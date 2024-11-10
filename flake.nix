@@ -21,7 +21,7 @@
     }@inputs:
     let
       system = "x86_64-linux";
-      moonbit = pkgs.callPackage ./pkgs/moonbit.nix { };
+      mbt = pkgs.callPackage ./pkgs/moonbit.nix { };
       ocaml_overlay = final: prev: {
         ocamlPackages = prev.ocaml-ng.ocamlPackages_5_2;
       };
@@ -44,11 +44,9 @@
     in
     {
       packages.${system} = rec {
-        inherit
-          moonbit
-          ;
-
-        default = moonbit;
+        moonbit = mbt.moonbit;
+        moonbit-core = mbt.moonbit-core;
+        default = mbt.moonbit;
       };
 
       devShells.${system} =
@@ -57,6 +55,7 @@
           vscode = pkgs.vscode-with-extensions.override {
             vscodeExtensions = [
               ext.vscode-marketplace.moonbit.moonbit-lang
+              ext.vscode-marketplace.ms-vscode.cpptools-extension-pack
             ];
           };
         in
@@ -65,7 +64,7 @@
 
           # moonbit dev shell/environment
           moonbit-dev = pkgs.mkShell {
-            nativeBuildInputs = [ moonbit ];
+            nativeBuildInputs = [ mbt.moonbit ];
             packages = [ vscode ];
           };
 
