@@ -44,7 +44,10 @@
     in
     {
       packages.${system} = rec {
-        inherit moonbit;
+        inherit
+          moonbit
+          ;
+
         default = moonbit;
       };
 
