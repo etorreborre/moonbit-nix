@@ -31,7 +31,13 @@ let
       runHook preInstall
       mkdir -p $out/bin
       for file in $src/*;do
-        install -m 755 "$file" $out/bin
+        ext=$(echo "$file" | sed 's/.*\.//')
+        case "$ext" in
+          "a" | "o" | "h")
+            cp "$file" $out/bin;;
+          *)
+            install -m 755 "$file" $out/bin
+        esac
       done
       runHook postInstall
     '';

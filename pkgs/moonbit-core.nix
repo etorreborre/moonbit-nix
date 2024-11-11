@@ -28,7 +28,7 @@ pkgs.stdenv.mkDerivation {
   buildPhase = ''
     runHook preBuild
     export PATH=${moonbit}/bin:$PATH
-    export MOON_HOME=$out/lib/core
+    export MOON_HOME=$out
     moon bundle --all --source-dir $out/lib/core
     moon bundle --target wasm-gc --source-dir $out/lib/core --quiet    
     runHook postBuild
