@@ -20,7 +20,7 @@
       ...
     }@inputs:
     let
-      system = "x86_64-linux";
+      system = "aarch64-darwin";
       mbt = pkgs.callPackage ./pkgs/moonbit.nix { };
       ocaml_overlay = final: prev: {
         ocamlPackages = prev.ocaml-ng.ocamlPackages_5_2;
